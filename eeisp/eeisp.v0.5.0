@@ -74,18 +74,31 @@ def generate_CDImatrix(A, args):
     is_nonzeroMat = A > 0
     p_nonzero = np.sum(is_nonzeroMat, axis=1) / ncell
 
-    print("Calculating CDI...")
-    Prob_joint = np.array(p_nonzero * p_nonzero[:, np.newaxis], dtype='float32')
-    Count_joint = np.zeros((ngene,ngene), dtype='uint16')
+    if(args.gpu):
+        print("using GPU for CDI calculation.")
+        import cupy as cp
+        p_nonzero = cp.asarray(p_nonzero)
+        is_nonzeroMat = cp.asarray(is_nonzeroMat)
+        Prob_joint = cp.array(p_nonzero * p_nonzero[:, cp.newaxis], dtype='float32')
+        Count_joint = cp.zeros((ngene, ngene), dtype='uint16')
+        for i in range(ngene):
+            Count_joint[i] = cp.sum(is_nonzeroMat[i] * is_nonzeroMat, axis=1)
 
-    p = mp.get_context('spawn').Pool(args.threads)
-    func_args = []
+        Prob_joint = cp.asnumpy(Prob_joint)
+        Count_joint = cp.asnumpy(Count_joint)
+    else:
+        print("using CPU for CDI calculation.")
+        Prob_joint = np.array(p_nonzero * p_nonzero[:, np.newaxis], dtype='float32')
+        Count_joint = np.zeros((ngene,ngene), dtype='uint16')
 
-    for i in range(ngene):
-        func_args.append((count_sum_nonzeroMat, i, is_nonzeroMat))
+        p = mp.get_context('spawn').Pool(args.threads)
+        func_args = []
 
-    Count_joint = p.map(argwrapper, func_args)
-    p.close()
+        for i in range(ngene):
+            func_args.append((count_sum_nonzeroMat, i, is_nonzeroMat))
+
+        Count_joint = p.map(argwrapper, func_args)
+        p.close()
 
     CDI = genMatrix_MultiProcess(Prob_joint, Count_joint, "CDI", ngene, ncell, ncore=args.threads)
 
@@ -102,19 +115,35 @@ def generate_EEImatrix(A, args):
     p_nonzero = np.sum(is_nonzeroMat, axis=1) / ncell
     p_zero = np.sum(A == 0, axis=1) / ncell
 
-    print("Calculating EEI...")
-    Prob_joint = np.array(p_nonzero * p_zero[:, np.newaxis], dtype='float32')
-    notA = np.logical_not(A)
-    Count_excl = np.zeros((ngene,ngene), dtype='uint16')
+    if(args.gpu):
+        print("using GPU for EEI calculation.")
+        import cupy as cp
+        p_nonzero = cp.asarray(p_nonzero)
+        p_zero = cp.asarray(p_zero)
+        is_nonzeroMat = cp.asarray(is_nonzeroMat)
+        notA = cp.asarray(np.logical_not(A))
 
-    p = mp.get_context('spawn').Pool(args.threads)
-    func_args = []
+        Prob_joint = cp.array(p_nonzero * p_zero[:, np.newaxis], dtype='float32')
+        Count_excl = cp.zeros((ngene, ngene), dtype='uint16')
+        for i in range(ngene):
+            Count_excl[i] = cp.sum(is_nonzeroMat[i] * notA, axis=1)
 
-    for i in range(ngene):
-        func_args.append((count_sum_nonzeroMatnotA, i, is_nonzeroMat, notA))
+        Prob_joint = cp.asnumpy(Prob_joint)
+        Count_excl = cp.asnumpy(Count_excl)
+    else:
+        print("using CPU for EEI calculation.")
+        Prob_joint = np.array(p_nonzero * p_zero[:, np.newaxis], dtype='float32')
+        notA = np.logical_not(A)
+        Count_excl = np.zeros((ngene,ngene), dtype='uint16')
 
-    Count_excl = np.array(p.map(argwrapper, func_args), dtype='uint16')
-    p.close()
+        p = mp.get_context('spawn').Pool(args.threads)
+        func_args = []
+
+        for i in range(ngene):
+            func_args.append((count_sum_nonzeroMatnotA, i, is_nonzeroMat, notA))
+
+        Count_excl = np.array(p.map(argwrapper, func_args), dtype='uint16')
+        p.close()
 
     del notA
     EEI = genMatrix_MultiProcess(Prob_joint, Count_excl, "EEI", ngene, ncell, ncore=args.threads)
@@ -182,10 +211,11 @@ def main():
     parser.add_argument("--threCDI", help="Threshold for CDI (default: 10.0)", type=float, default=10)
     parser.add_argument("--threEEI", help="Threshold for EEI (default: 5.0)", type=float, default=5)
     parser.add_argument("--tsv", help="Specify when the input file is tab-delimited (.tsv)", action="store_true")
+    parser.add_argument("--gpu", help="GPU mode", action="store_true")
     parser.add_argument("--CDIonly", help="Calculate CDI only", action="store_true")
     parser.add_argument("--EEIonly", help="Calculate EEI only", action="store_true")
     parser.add_argument("-p", "--threads", help="number of threads (default: 2)", type=int, default=2)
-    parser.add_argument("-v", "--version", action='version', version='%(prog)s 0.6.0')
+    parser.add_argument("-v", "--version", action='version', version='%(prog)s 0.5.0')
 
     args = parser.parse_args()
     print(args)

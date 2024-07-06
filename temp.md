@@ -1,12 +1,19 @@
 # EEISP
 
 EEISP identifies gene pairs that are codependent and mutually exclusive from single-cell RNA-seq data. 
-       
-## Installation
 
-    pip3 install eeisp
+## 0. Changelog
 
-###  (Optional) Dependencies for GPU
+See [Changelog](https://github.com/rnakato/Churros/blob/master/ChangeLog.md)
+
+## 1. Installation
+
+    pip3 install -U eeisp
+
+### 1.1 (Optional) Dependencies for GPU
+
+(From version 0.4.1, EEISP is fast enough on CPUs only, so there is no need to use GPUs.)
+
 EEISP requires [cupy](https://cupy.dev/) when using GPU computation `--gpu`. Use pip to install cupy like this (see [the manual](https://docs.cupy.dev/en/stable/install.html) for more detail).
 
     # For CUDA 9.2
@@ -16,7 +23,8 @@ EEISP requires [cupy](https://cupy.dev/) when using GPU computation `--gpu`. Use
 
 If you do not use `--gpu`, you do not need to install cupy.
 
-## Usage
+## 2. Usage
+
 EEISP takes a read count matrix as an input, in which rows and columns represent genes and cells, respectively. A gzipped file (.gz) is also acceptable.
 
    0. (Optional) Convert CellRanger output to an input matrix (require R and [Seurat](https://satijalab.org/seurat/) library)
@@ -57,7 +65,9 @@ EEISP takes a read count matrix as an input, in which rows and columns represent
            --i_id I_ID      column number of gene id (default: 0)
            --i_name I_NAME  column number of gene name (default: 1)
        ```
-## Tutorial
+
+## 3. Tutorial
+
 The sample data is included in `sample` directory. 
    * `data.txt`: the input matrix of scRNA-seq data.
    * `genelidlist.txt`: the gene list for `eeisp_add_genename_from_geneid`.
@@ -116,5 +126,6 @@ The output files include gene names.
    4       6       ESG100005       ESG000007       RP11-34P13.8    RP11-34P13.9    0.5258703930217091
 ```
 
-## Reference
+## 4. Reference
+
 Nakajima N., Hayashi T., Fujiki K., Shirahige K., Akiyama T., Akutsu T. and Nakato R., [Codependency and mutual exclusivity for gene community detection from sparse single-cell transcriptome data](https://academic.oup.com/nar/advance-article/doi/10.1093/nar/gkab601/6324613), *Nucleic Acids Research*, 2021.
