@@ -10,19 +10,6 @@ See [Changelog](https://github.com/rnakato/Churros/blob/master/ChangeLog.md)
 
     pip3 install -U eeisp
 
-### 1.1 (Optional) Dependencies for GPU
-
-(From version 0.4.1, EEISP is fast enough on CPUs only, so there is no need to use GPUs.)
-
-EEISP requires [cupy](https://cupy.dev/) when using GPU computation `--gpu`. Use pip to install cupy like this (see [the manual](https://docs.cupy.dev/en/stable/install.html) for more detail).
-
-    # For CUDA 9.2
-    pip3 install cupy-cuda92
-    # For CUDA 10.1
-    pip3 install cupy-cuda101
-
-If you do not use `--gpu`, you do not need to install cupy.
-
 ## 2. Usage
 
 EEISP takes a read count matrix as an input, in which rows and columns represent genes and cells, respectively. A gzipped file (.gz) is also acceptable.
@@ -126,11 +113,6 @@ The output files include gene names.
    4       6       ESG100005       ESG000007       RP11-34P13.8    RP11-34P13.9    0.5258703930217091
 ```
 
-<<<<<<<< HEAD:temp.md
 ## 4. Reference
 
 Nakajima N., Hayashi T., Fujiki K., Shirahige K., Akiyama T., Akutsu T. and Nakato R., [Codependency and mutual exclusivity for gene community detection from sparse single-cell transcriptome data](https://academic.oup.com/nar/advance-article/doi/10.1093/nar/gkab601/6324613), *Nucleic Acids Research*, 2021.
-========
-## Reference
-Nakajima N., Hayashi T., Fujiki K., Shirahige K., Akiyama T., Akutsu T. and Nakato R., Codependency and mutual exclusivity for gene community detection from sparse single-cell transcriptome data, *Nucleic Acids Research*, 2021. DOI: [10.1093/nar/gkab601](https://academic.oup.com/nar/article/49/18/e104/6324613)
->>>>>>>> 303ceb07d3442cb365249d658fe2dc87a0030253:README.md.old
