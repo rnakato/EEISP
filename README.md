@@ -1,5 +1,7 @@
 # EEISP
 
+[![PyPI](https://img.shields.io/pypi/v/eeisp?logo=pypi&logoColor=white)](https://pypi.org/project/eeisp/)
+
 EEISP identifies gene pairs that are codependent and mutually exclusive from single-cell RNA-seq data. 
 
 ## 0. Changelog

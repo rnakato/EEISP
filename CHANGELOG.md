@@ -5,6 +5,7 @@
 - Output conventions: when a plain output prefix is provided (e.g. `Sample`), EEISP now writes outputs under `data/output/` by default.
 - Optional features: added a 10X CellRanger converter (`eeisp-convert-10x`) behind an optional `scanpy` extra (`eeisp[scanpy]`).
 - Cleanup: removed legacy/duplicated scripts and old packaging artifacts.
+- Tests/CI: added a sample-based pytest integration test and a GitHub Actions workflow to run it.
 
 ### Benefits
 
