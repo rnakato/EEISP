@@ -4,21 +4,46 @@ EEISP identifies gene pairs that are codependent and mutually exclusive from sin
 
 ## 0. Changelog
 
-See [Changelog](https://github.com/rnakato/Churros/blob/master/ChangeLog.md)
+See [Changelog](CHANGELOG.md)
 
 ## 1. Installation
 
-    pip3 install -U eeisp
+```bash
+pip3 install -U eeisp
+
+# Optional: Install with additional features
+pip install 'eeisp[scanpy]'  # For 10X CellRanger conversion
+pip install 'eeisp[gpu]'      # For GPU acceleration (requires CUDA)
+```
+
+### Install as a `uv` tool (global)
+
+If you use `uv`, you can install EEISP as an isolated tool (recommended for CLI usage):
+
+```
+uv tool install eeisp
+```
+
+This will expose the commands on your `PATH` (e.g. `eeisp`, `add-names`, `heatmap`, `louvain`, `louvain-signed`).
+
+### Run once without installing (uvx)
+
+```
+uvx eeisp --help
+uvx --from eeisp add-names --help
+```
 
 ## 2. Usage
 
 EEISP takes a read count matrix as an input, in which rows and columns represent genes and cells, respectively. A gzipped file (.gz) is also acceptable.
 
-   0. (Optional) Convert CellRanger output to an input matrix (require R and [Seurat](https://satijalab.org/seurat/) library)
-       ```
-         datadir="outs/filtered_feature_bc_matrix/"
-         matrix="matrix.txt"
-         R -e "library(Seurat); so <- Read10X('$datadir'); write.table(so, '$matrix', quote=F, sep=',', col.names=T)"
+   0. (Optional) Convert CellRanger output to an input matrix (requires scanpy: `pip install 'eeisp[scanpy]'`)
+       ```bash
+       # From directory format (matrix.mtx)
+       eeisp-convert-10x outs/filtered_feature_bc_matrix/ matrix.txt
+       
+       # Or from .h5 format
+       eeisp-convert-10x filtered_feature_bc_matrix.h5 matrix.txt --format h5
        ```
 
    1.  `eeisp` calculates the CDI and EEI scores for all gene pairs. The output contains lists of gene pairs that have CDI or EEI values above the specified threshold and the tables of degree distribution.
@@ -55,26 +80,53 @@ EEISP takes a read count matrix as an input, in which rows and columns represent
 
 ## 3. Tutorial
 
-The sample data is included in `sample` directory. 
+The sample data is included in `data/sample` directory.
    * `data.txt`: the input matrix of scRNA-seq data.
    * `genelidlist.txt`: the gene list for `eeisp_add_genename_from_geneid`.
 
+### Converting 10X CellRanger data (optional)
 
-    eeisp data.txt Sample --threCDI 0.5 --threEEI 0.5 -p 8
-This command outputs gene pair lists that have CDI>0.5 or EEI>0.5. `-p 8` means 8 CPUs are used.
+If you have 10X CellRanger output, convert it first:
 
-Supply `--gpu` option to GPU computation (require [cupy](https://www.preferred.jp/en/projects/cupy/)):
+```bash
+# Install with scanpy support
+uv sync --extra scanpy
 
-    eeisp data.txt Sample --threCDI 0.5 --threEEI 0.5 -p 8 --gpu
+# Convert CellRanger output
+uv run eeisp-convert-10x outs/filtered_feature_bc_matrix/ data/input/matrix.txt
+```
+
+### Running EEISP analysis
+
+
+Run with `uv` (recommended for this repo checkout). Outputs go to `data/output/` by default if you pass a plain prefix like `Sample`:
+
+```
+uv sync
+uv run eeisp data/sample/data.txt Sample --threCDI 0.5 --threEEI 0.5 -p 8
+uv run add-names data/output/Sample_CDI_score_data_thre0.5.txt data/output/Sample_CDI_score_data_thre0.5.addgenename.txt data/sample/geneidlist.txt
+uv run add-names data/output/Sample_EEI_score_data_thre0.5.txt data/output/Sample_EEI_score_data_thre0.5.addgenename.txt data/sample/geneidlist.txt
+```
+
+Supply `--gpu` option for GPU computation:
+
+```bash
+# Install with GPU support
+uv sync --extra gpu
+# or: pip install 'eeisp[gpu]'
+
+# Run with GPU
+uv run eeisp data/sample/data.txt Sample --threCDI 0.5 --threEEI 0.5 -p 8 --gpu
+```
     
 (Note: Since GPU computation covers a part of eeisp, it is better to use multiple CPUs even in `--gpu` mode for the fast computation.)
 
 Output files are:
 ```
-   Sample_CDI_score_data_thre0.5.txt            # A list of gene pairs with CDI score.  
-   Sample_CDI_degree_distribution_thre0.5.csv   # A table of the number of CDI degree and genes.  
-   Sample_EEI_score_data_thre0.5.txt            # A list of gene pairs with EEI scores.  
-   Sample_EEI_degree_distribution_thre0.5.csv   # A table of the number of EEI degree and genes.
+   data/output/Sample_CDI_score_data_thre0.5.txt            # A list of gene pairs with CDI score.
+   data/output/Sample_CDI_degree_distribution.tsv           # A table of the number of CDI degree and genes.
+   data/output/Sample_EEI_score_data_thre0.5.txt            # A list of gene pairs with EEI scores.
+   data/output/Sample_EEI_degree_distribution.tsv           # A table of the number of EEI degree and genes.
 ```
 The output files might include gene ids only. 
 
@@ -91,14 +143,14 @@ The output files might include gene ids only.
 If you want to add gene names (Symbols), use `eeisp_add_genename_from_geneid` with `geneidlist.txt`, which contains the pairs of gene ids and names.
 
 ```
- eeisp_add_genename_from_geneid \
-     Sample_CDI_score_data_thre0.5.txt \
-     Sample_CDI_score_data_thre0.5.addgenename.txt \
-     geneidlist.txt
- eeisp_add_genename_from_geneid \
-     Sample_EEI_score_data_thre0.5.txt \
-     Sample_EEI_score_data_thre0.5.addgenename.txt \
-     geneidlist.txt
+uv run add-names \
+    data/output/Sample_CDI_score_data_thre0.5.txt \
+    data/output/Sample_CDI_score_data_thre0.5.addgenename.txt \
+    data/sample/geneidlist.txt
+uv run add-names \
+    data/output/Sample_EEI_score_data_thre0.5.txt \
+    data/output/Sample_EEI_score_data_thre0.5.addgenename.txt \
+    data/sample/geneidlist.txt
 ```
 
 The output files include gene names.

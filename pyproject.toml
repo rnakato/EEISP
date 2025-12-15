@@ -1,0 +1,76 @@
+[build-system]
+requires = ["hatchling>=1.25.0"]
+build-backend = "hatchling.build"
+
+[project]
+name = "eeisp"
+version = "0.6.0"
+description = "Identify gene pairs that are codependent and mutually exclusive from single-cell RNA-seq data."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "GPL-3.0-only" }
+authors = [
+  { name = "Ryuichiro Nakato", email = "rnakato@iqb.u-tokyo.ac.jp" },
+]
+keywords = ["eeisp", "scRNA-seq"]
+dependencies = [
+  "matplotlib>=3.8",
+  "networkx>=3.2",
+  "numpy>=1.26",
+  "polars>=1.10",
+  "python-igraph>=0.11.6",
+  "scipy>=1.11",
+  "seaborn>=0.13",
+  "typer>=0.12",
+]
+
+[project.optional-dependencies]
+dev = [
+  "mypy>=1.13",
+  "ruff>=0.8.4",
+]
+scanpy = [
+  "scanpy>=1.10",
+  "anndata>=0.10",
+]
+gpu = [
+  "cupy>=12.0",
+]
+
+[project.scripts]
+eeisp = "eeisp.cli_eeisp:main"
+eeisp_add_genename_from_geneid = "eeisp.cli_add_genename_from_geneid:main"
+eeisp_convert_10x = "eeisp.cli_convert_10x:main"
+"eeisp.heatmap" = "eeisp.cli_heatmap:main"
+"eeisp.Louvain" = "eeisp.cli_louvain:main"
+"eeisp.LouvainSigned" = "eeisp.cli_louvain_signed:main"
+
+# Short aliases (recommended)
+eeisp-add-names = "eeisp.cli_add_genename_from_geneid:main"
+eeisp-convert-10x = "eeisp.cli_convert_10x:main"
+eeisp-heatmap = "eeisp.cli_heatmap:main"
+eeisp-louvain = "eeisp.cli_louvain:main"
+eeisp-louvain-signed = "eeisp.cli_louvain_signed:main"
+
+# Ultra-short aliases (handy with `uv run` inside this repo)
+add-names = "eeisp.cli_add_genename_from_geneid:main"
+convert-10x = "eeisp.cli_convert_10x:main"
+heatmap = "eeisp.cli_heatmap:main"
+louvain = "eeisp.cli_louvain:main"
+louvain-signed = "eeisp.cli_louvain_signed:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/eeisp"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+no_implicit_optional = true
+ignore_missing_imports = true
+
+
