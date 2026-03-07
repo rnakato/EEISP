@@ -4,7 +4,7 @@ EEISP identifies gene pairs that are codependent and mutually exclusive from sin
 
 ## 0. Changelog
 
-See [Changelog](https://github.com/nakatolab/EEISP/blob/master/README.md)
+See [Changelog](https://github.com/rnakato/EEISP/blob/master/ChangeLog.md)
 
 ## 1. Installation
 
