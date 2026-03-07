@@ -17,6 +17,12 @@ import argparse
 import multiprocessing as mp
 import gc
 
+try:
+    from importlib.metadata import version as pkg_version
+    __version__ = pkg_version("eeisp")
+except Exception:
+    __version__ = "dev"
+
 def argwrapper(args):
     return args[0](*args[1:])
 
@@ -185,7 +191,7 @@ def main():
     parser.add_argument("--CDIonly", help="Calculate CDI only", action="store_true")
     parser.add_argument("--EEIonly", help="Calculate EEI only", action="store_true")
     parser.add_argument("-p", "--threads", help="number of threads (default: 2)", type=int, default=2)
-    parser.add_argument("-v", "--version", action='version', version='%(prog)s 0.6.0')
+    parser.add_argument("-v", "--version", action="version", version=f"%(prog)s {__version__}")
 
     args = parser.parse_args()
     print(args)

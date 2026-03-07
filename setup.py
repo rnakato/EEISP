@@ -6,7 +6,7 @@ with open("README.md", "r") as fh:
 setuptools.setup(
     name="eeisp",
 #    version="0.6.57", # for test
-    version="0.6.0", # for PyPI
+    version="0.6.3", # for PyPI
     license="GPL3.0",
     install_requires=[
         "numpy>=1.14.2",
