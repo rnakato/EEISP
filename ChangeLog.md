@@ -1,3 +1,7 @@
+## 0.6.1 (2026-03-07)
+- Modified `eeisp_add_genename_from_geneid` and added `geneidlist.GRCm38.txt`
+- Added a new script `gene_geneidlist.sh` to generate the geneid list.
+
 ## 0.6.0 (2024-07-06)
 - Added `LouvainSigned.py` and `network.py`
 
