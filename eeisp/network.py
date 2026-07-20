@@ -194,7 +194,7 @@ def visualize_top_weighted_nodes_between_genes(graph, gene_names, top_n):
     subgraph_nodes = set(top_nodes).union(set(gene_ids))
     subgraph = graph.subgraph(subgraph_nodes)
 
-    pos = nx.spring_layout(subgraph) 
+    pos = nx.spring_layout(subgraph)
     node_colors = ['red' if node in gene_ids else 'lightblue' for node in subgraph.nodes()]
 
     nx.draw_networkx_nodes(subgraph, pos, node_color=node_colors, node_size=500)
