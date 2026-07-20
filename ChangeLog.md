@@ -1,3 +1,8 @@
+## 0.6.4 (2026-07-20)
+- Removed `LouvainSigned.py` and `eeisp.Louvain`
+- Fixed a bug "RuntimeWarning: divide by zero encountered in log10" when calculating CDI.
+- Fixed a warning "The behavior of DataFrame.sum with axis=None is deprecated, in a future version this will reduce over both axes and return a scalar."
+
 ## 0.6.3 (2026-03-07)
 - Modified `eeisp_add_genename_from_geneid` and added `geneidlist.GRCm38.txt`
 - Added a new script `gene_geneidlist.sh` to generate the geneid list.

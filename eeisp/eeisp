@@ -46,7 +46,18 @@ def calcEEI_eachrow(i, ProbArray_i, CountArray_i, ProbArray_T_i, CountArray_T_i,
     p2 = ProbArray_T_i[i + 1:]
     prob2 = binom.sf(x2 - 1, ncell, p2)
 
-    val = np.where((prob1 <= 0) | (prob2 <= 0), -10000000.0, (-(np.log10(prob1)) + (-(np.log10(prob2)))) / 2)
+    invalid = (prob1 <= 0) | (prob2 <= 0)
+
+    val = np.full_like(prob1, -10000000.0, dtype=float)
+
+    valid = ~invalid
+    val[valid] = (
+        -np.log10(prob1[valid])
+        -np.log10(prob2[valid])
+    ) / 2
+
+
+#    val = np.where((prob1 <= 0) | (prob2 <= 0), -10000000.0, (-(np.log10(prob1)) + (-(np.log10(prob2)))) / 2)
     array = np.pad(val, (i + 1, 0), mode='constant', constant_values=0)
     return array
 
@@ -98,7 +109,6 @@ def generate_CDImatrix(A, args):
     return CDI
 
 def count_sum_nonzeroMatnotA(i, is_nonzeroMat, notA):
-#    return np.sum(np.logical_and(is_nonzeroMat[i,:], notA), axis=1)
     return np.sum(is_nonzeroMat[i,:] * notA, axis=1)
 
 def generate_EEImatrix(A, args):
@@ -129,7 +139,9 @@ def generate_EEImatrix(A, args):
 
 def calc_degree(Matrix, thre, ngene, filename, output, genenames):
     df = pd.DataFrame(Matrix)
-    degree = np.sum(df > thre).tolist()
+#    degree = np.sum(df > thre).tolist()
+    degree = (df > thre).sum(axis=0).tolist()
+    
     df = df[df > thre]
     df = df.stack().reset_index()
     df.columns = ["i", "j", "val"]

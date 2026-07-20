@@ -1,12 +1,19 @@
 import setuptools
 
+def get_version(rel_path):
+    for line in open(rel_path).read().splitlines():
+        if line.startswith('__version__'):
+            delim = '"' if '"' in line else "'"
+            return line.split(delim)[1]
+    else:
+        raise RuntimeError("Unable to find version string.")
+
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
     name="eeisp",
-#    version="0.6.57", # for test
-    version="0.6.3", # for PyPI
+    version=get_version("eeisp/__init__.py"),
     license="GPL3.0",
     install_requires=[
         "numpy>=1.14.2",
@@ -26,8 +33,6 @@ setuptools.setup(
     keywords="eeisp scRNA-seq",
     scripts=['eeisp/eeisp',
              'eeisp/eeisp.heatmap',
-             'eeisp/eeisp.Louvain',
-             'eeisp/eeisp.LouvainSigned',
              'eeisp/eeisp_add_genename_from_geneid'
              ],
     packages=setuptools.find_packages(),
